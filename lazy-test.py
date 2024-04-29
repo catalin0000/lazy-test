@@ -37,8 +37,42 @@ def nmap_scan(ip):
     else:
         subprocess.run(['nmap','-Pn','-p-','--min-rate=500','--max-retries=3','--max-rtt-timeout=900ms', '-T4', '-sS','-dd','-oA',f'nmap/{ip}.tcp',ip])
 
+def file_read(file_path):
+    if os.path.isfile(file_path):
+            try:
+                nmap_results = ET.ElementTree(file=f)
+                parse_ips(nmap_results)
+                if args.test:
+                    None
+                else:
+                    with open('nmap_open_ports.json', 'w') as f:
+                        json.dump(nmap_res, f)
 
-def parse_ips(nmap_results):
+            except:
+                print("That's not a recognised file type.")
+
+
+def parse_ips(file_path):
+    if os.path.isfile(file_path):
+            try:
+                nmap_results = ET.ElementTree(file=f)
+            except:
+                print("That's not a recognised file type.")
+    
+
+    elif os.path.isdir(file_path):
+        files = glob.glob(f"{file_path}/*.xml")
+        for f in files:  
+                    try:
+                        nmap_results = ET.ElementTree(file=f)
+                        parse_ips(nmap_results)   
+
+                                         
+                    except Exception as e:
+                        print(f"Error parsing {f}: {e}")
+
+
+
     # Parse the xml for all IPv4 addresses which are good keys for each set of results
     host_ip = None
     open_ports = {}
