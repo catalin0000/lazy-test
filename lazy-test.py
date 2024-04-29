@@ -33,9 +33,7 @@ def nmap_scan(ip):
     if "/" in str(ip): 
         print('if you are looking to test an internal network this is not the way, use naptest')
         targets = ip.split('/')[0]
-        print(targets)
         subprocess.run(['nmap','-sn','-oA',f'nmap/{targets}.hosts.up',ip])
-        print(ip)
     else:
         subprocess.run(['nmap','-Pn','-p-','--min-rate=500','--max-retries=3','--max-rtt-timeout=900ms', '-T4', '-sS','-dd','-oA',f'nmap/{ip}.tcp',ip])
 
@@ -130,7 +128,7 @@ if __name__ == '__main__':
 
                 
 
-
+    print(nmap_res)
 
 
 
