@@ -506,7 +506,19 @@ def parse_ips(file_path):
 
 
 
-
+def runtests():
+    for key in servicearray.keys():
+        if key == 'closed ranges' or key == 'closed ports':
+            continue
+        else:
+            print(key)
+            if key == 'ftp':
+                print(servicearray[key])
+            if key == 'http' or key == 'https':
+                print(servicearray[key], 'will run dirb')
+            if key == 'sslport':
+                print(servicearray[key], 'run testssl')
+            # print(key)
 
 
 if __name__ == '__main__':
@@ -534,7 +546,8 @@ if __name__ == '__main__':
         findservices()
         outputarray()
         outputfiles()
-
+        runtests()
+        # print(servicearray)
 
     if args.parse:
         db = os.path.join(args.output, dbfile)
@@ -592,7 +605,7 @@ if __name__ == '__main__':
 
                 
 
-    print(nmap_res)
+    # print(nmap_res)
 
 
 
