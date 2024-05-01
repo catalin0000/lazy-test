@@ -513,11 +513,14 @@ def runtests():
         else:
             print(key)
             if key == 'ftp':
-                print(servicearray[key])
+                print('running ftp scan on:',servicearray[key])
             if key == 'http' or key == 'https':
                 print(servicearray[key], 'will run dirb')
             if key == 'sslport':
-                print(servicearray[key], 'run testssl')
+                for item in servicearray[key]['tcp']:
+                    subprocess.run(['testssl','-sn','-oA',f'nmap/{targets}.hosts.up',ip])
+                    print(f'testssl {item}')
+                # print(servicearray[key]['tcp'], 'run testssl')
             # print(key)
 
 
