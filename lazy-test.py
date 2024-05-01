@@ -507,6 +507,13 @@ def parse_ips(file_path):
 
 
 def runtests():
+    if not os.path.exists('tests'):
+        os.mkdir('tests')
+    
+    if not os.path.exists(os.path.join(os.getcwd(), 'tests', 'ssl')):
+        os.mkdir('tests/ssl')
+        
+
     for key in servicearray.keys():
         if key == 'closed ranges' or key == 'closed ports':
             continue
@@ -517,12 +524,15 @@ def runtests():
             if key == 'http' or key == 'https':
                 print(servicearray[key], 'will run dirb')
             if key == 'sslport':
-                for item in servicearray[key]['tcp']:
-                    subprocess.run(['testssl','-sn','-oA',f'nmap/{targets}.hosts.up',ip])
-                    print(f'testssl {item}')
-                # print(servicearray[key]['tcp'], 'run testssl')
-            # print(key)
+                with Pool(processes=20) as pool:
+                        pool.map(testssl, servicearray[key]['tcp'])
+            
 
+def testssl(ip):
+    subprocess.run(['testssl', '-oJ', f'tests/ssl/{ip}.json',ip])
+
+def dirb(host):
+    subprocess.run(['testssl', '-oJ', f'tests/ssl/{ip}.json',ip])
 
 if __name__ == '__main__':
     global servicearray
