@@ -472,7 +472,7 @@ def parse_ips(file_path):
     
 
     elif os.path.isdir(file_path):
-        files = glob.glob(f"{file_path}/*.xml")
+        files = glob.glob(f'{file_path}/*.xml')
         for f in files:  
                     try:
                         nmap_results = ET.ElementTree(file=f)
@@ -507,6 +507,8 @@ def parse_ips(file_path):
 
 
 def runtests():
+    ssltests=[]
+    httptests=[]
     if not os.path.exists('tests'):
         os.mkdir('tests')
     
@@ -520,19 +522,40 @@ def runtests():
         else:
             print(key)
             if key == 'ftp':
-                print('running ftp scan on:',servicearray[key])
+                print('running ftp scan on:',servicearray[key]['tcp'])
             if key == 'http' or key == 'https':
+                with Pool(processes=20) as pool:
+                        pool.map(dirb, servicearray[key]['tcp'])
+
                 print(servicearray[key], 'will run dirb')
             if key == 'sslport':
                 with Pool(processes=20) as pool:
                         pool.map(testssl, servicearray[key]['tcp'])
-            
+    
+
+
+
+
 
 def testssl(ip):
-    subprocess.run(['testssl', '-oJ', f'tests/ssl/{ip}.json',ip])
+    # subprocess.run(['testssl', '-oJ', f'tests/ssl/{ip}.json',ip])
+    print('testssl running on:', ip)
 
 def dirb(host):
-    subprocess.run(['testssl', '-oJ', f'tests/ssl/{ip}.json',ip])
+    print('dirb running on:',host)
+    # if host.endswith(':443'):
+        # subprocess.run(['dirb', f'https://{host}', f'dirb/{host}.txt'])
+    # if host.endswith(':80'):
+        # subprocess.run(['dirb', f'http://{host}', f'dirb/{host}.txt'])
+
+def nuclei(host):
+    print('nuclei running on:', host)
+    # if host.endswith(':443'):
+        # subprocess.run(['nuclei', '-u', f'https://{host}', '-fe',f'nuclei/{host}.json'])
+    # if host.endswith(':80'):
+        # subprocess.run(['nuclei', '-u', f'http://{host}', f'nuclei/{host}.json'])
+
+
 
 if __name__ == '__main__':
     global servicearray
@@ -568,6 +591,9 @@ if __name__ == '__main__':
         findservices()
         outputarray()
         outputfiles()
+        runtests()
+
+
 
     # if args.parse:
     #     file_path = args.parse
