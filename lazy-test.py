@@ -33,6 +33,8 @@ svcfolder="services"
 
 nmap_res={}
 
+check = False
+
 def db_connect():
     con = lite.connect(db)
     cur = con.cursor()
@@ -58,10 +60,15 @@ def db_connect():
     return con
 
 def nmap_scan(ip):
+    global check
     if "/" in str(ip): 
         print('if you are looking to test an internal network this is not the way, use naptest')
         targets = ip.split('/')[0]
-        # subprocess.run(['nmap','-sn','-oA',f'nmap/{targets}.hosts.up',ip])
+        subprocess.run(['nmap','-sn','-oA',f'nmap/{targets}.hosts.up',ip])
+
+        print(check)
+        check = True
+        print(check)
     else:
         print('lets say scan is done')
         # subprocess.run(['nmap','-Pn','--min-rate=500','--max-retries=3','--max-rtt-timeout=900ms', '-T4', '-sS','-dd','-oA',f'nmap/{ip}.tcp',ip])
@@ -560,6 +567,7 @@ def nuclei(host):
 if __name__ == '__main__':
     global servicearray
     servicearray = {}
+    live_hosts = []
     if args.nmap:
         os.makedirs('nmap', exist_ok=True)
         file_path = args.nmap
@@ -569,6 +577,13 @@ if __name__ == '__main__':
                     targets_list=[line.strip() for line in file]
                     with Pool(processes=20) as pool:
                         pool.map(nmap_scan, targets_list)
+
+                    print(check)
+                    if check:
+                        print('it run')
+                        with Pool(processes=20) as pool:
+                            pool.map(nmap_scan, live_hosts)
+
 
             except FileNotFoundError:
                 print("File not found.")
@@ -585,6 +600,7 @@ if __name__ == '__main__':
         runtests()
         # print(servicearray)
 
+    print(check)
     if args.parse:
         db = os.path.join(args.output, dbfile)
         filehandler(args.parse)
